@@ -1,7 +1,7 @@
-package com.ixam97.carStatsViewer.activities
+package com.mbuehler.carStatsViewer.activities
 
-import com.ixam97.carStatsViewer.*
-import com.ixam97.carStatsViewer.objects.*
+import com.mbuehler.carStatsViewer.*
+import com.mbuehler.carStatsViewer.objects.*
 import android.app.Activity
 import android.app.AlertDialog
 import android.os.Bundle

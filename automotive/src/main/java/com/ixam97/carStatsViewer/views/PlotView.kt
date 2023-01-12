@@ -1,4 +1,4 @@
-package com.ixam97.carStatsViewer.views
+package com.mbuehler.carStatsViewer.views
 
 import android.R
 import android.content.Context
@@ -6,7 +6,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
-import com.ixam97.carStatsViewer.plot.*
+import com.mbuehler.carStatsViewer.plot.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 

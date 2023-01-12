@@ -1,9 +1,9 @@
-package com.ixam97.carStatsViewer.services
+package com.mbuehler.carStatsViewer.services
 
 
-import com.ixam97.carStatsViewer.plot.*
-import com.ixam97.carStatsViewer.objects.*
-import com.ixam97.carStatsViewer.*
+import com.mbuehler.carStatsViewer.plot.*
+import com.mbuehler.carStatsViewer.objects.*
+import com.mbuehler.carStatsViewer.*
 import android.app.*
 import android.car.Car
 import android.car.VehicleGear
@@ -18,7 +18,7 @@ import android.os.*
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
-import com.ixam97.carStatsViewer.activities.emulatorMode
+import com.mbuehler.carStatsViewer.activities.emulatorMode
 import kotlin.collections.HashMap
 import kotlin.math.absoluteValue
 

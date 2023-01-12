@@ -1,4 +1,4 @@
-package com.ixam97.carStatsViewer.objects
+package com.mbuehler.carStatsViewer.objects
 
 object AppPreferences {
     var debug = false

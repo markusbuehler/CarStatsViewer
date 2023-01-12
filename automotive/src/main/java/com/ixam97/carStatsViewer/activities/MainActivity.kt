@@ -1,8 +1,8 @@
-package com.ixam97.carStatsViewer.activities
+package com.mbuehler.carStatsViewer.activities
 
-import com.ixam97.carStatsViewer.*
-import com.ixam97.carStatsViewer.objects.*
-import com.ixam97.carStatsViewer.services.*
+import com.mbuehler.carStatsViewer.*
+import com.mbuehler.carStatsViewer.objects.*
+import com.mbuehler.carStatsViewer.services.*
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.PendingIntent
@@ -20,7 +20,7 @@ import android.os.SystemClock
 import android.provider.ContactsContract.Data
 import android.view.View
 import android.widget.Toast
-import com.ixam97.carStatsViewer.plot.PlotDimension
+import com.mbuehler.carStatsViewer.plot.PlotDimension
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import java.util.concurrent.TimeUnit

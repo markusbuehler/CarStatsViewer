@@ -1,7 +1,7 @@
-package com.ixam97.carStatsViewer.objects
+package com.mbuehler.carStatsViewer.objects
 
 import android.car.VehicleGear
-import com.ixam97.carStatsViewer.plot.*
+import com.mbuehler.carStatsViewer.plot.*
 
 object DataHolder {
 
