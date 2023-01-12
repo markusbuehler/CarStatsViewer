@@ -19,12 +19,16 @@ import android.os.SystemClock
 import android.view.View
 import android.widget.Toast
 import com.mbuehler.carStatsViewer.plot.PlotDimension
+import com.mbuehler.carStatsViewer.plot.PlotPaint
+import com.mbuehler.carStatsViewer.views.PlotView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 var emulatorMode = false
 var emulatorPowerSign = -1
+
+const val SETTINGS_REQUEST_CODE = 1
 
 class MainActivity : Activity() {
     companion object {
@@ -68,6 +72,19 @@ class MainActivity : Activity() {
             DataHolder.consumptionPlotLine.LabelFormat = "%.1f"
             DataHolder.consumptionPlotLine.Divider = 10f
         }
+
+
+        if (appPreferences.consumptionPlotSecondaryColor) {
+            DataHolder.speedPlotLine.plotPaint = PlotPaint.byColor(Color.LTGRAY, main_consumption_plot.textSize)
+        } else {
+            DataHolder.speedPlotLine.plotPaint = PlotPaint.byColor(Color.parseColor("#00BF00"), main_consumption_plot.textSize)
+        }
+        
+        main_power_gage.maxValue = if (appPreferences.consumptionPlotSingleMotor) 170f else 300f
+        main_power_gage.minValue = if (appPreferences.consumptionPlotSingleMotor) -100f else -150f
+
+        main_power_gage.barVisibility = appPreferences.consumptionPlotVisibleGages
+        main_consumption_gage.barVisibility = appPreferences.consumptionPlotVisibleGages
 
         enableUiUpdates()
     }
@@ -357,8 +374,8 @@ class MainActivity : Activity() {
 
         main_power_gage.gageName = getString(R.string.main_gage_power)
         main_power_gage.gageUnit = "kW"
-        main_power_gage.maxValue = 300f
-        main_power_gage.minValue = -150f
+        main_power_gage.maxValue = if (appPreferences.consumptionPlotSingleMotor) 170f else 300f
+        main_power_gage.minValue = if (appPreferences.consumptionPlotSingleMotor) -100f else -150f
         main_power_gage.setValue(0f)
 
         main_consumption_gage.gageName = getString(R.string.main_gage_consumption)
@@ -393,8 +410,6 @@ class MainActivity : Activity() {
             }
         }
 
-
-
         main_button_reset.setOnClickListener {
 
             val builder = AlertDialog.Builder(this@MainActivity)
@@ -415,7 +430,7 @@ class MainActivity : Activity() {
         }
 
         main_button_settings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+            startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_REQUEST_CODE)
         }
 
         /** cycle through consumption plot distances when tapping the plot */
@@ -487,4 +502,5 @@ class MainActivity : Activity() {
             timerHandler.removeCallbacks(updateActivityTask)
         }
     }
+
 }
