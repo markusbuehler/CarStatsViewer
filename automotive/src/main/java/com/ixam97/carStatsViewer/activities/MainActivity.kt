@@ -33,7 +33,7 @@ const val SETTINGS_REQUEST_CODE = 1
 class MainActivity : Activity() {
     companion object {
         private val permissions = arrayOf(Car.PERMISSION_ENERGY, Car.PERMISSION_SPEED)
-        private const val uiUpdateDelayMillis = 40L
+        private const val uiUpdateDelayMillis = 200L
     }
 
     /** values and variables */
@@ -312,6 +312,15 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun dimensionSmoothingById(id : Int) : Long {
+        return when (id) {
+            1 -> 100L
+            2 -> 500L
+            3 -> 1_000L
+            else -> 100L
+        }
+    }
+
     private fun checkPermissions() {
         if(checkSelfPermission(Car.PERMISSION_ENERGY) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(permissions, 0)
@@ -362,6 +371,7 @@ class MainActivity : Activity() {
 
         main_consumption_plot.dimension = PlotDimension.DISTANCE
         main_consumption_plot.dimensionRestriction = dimensionRestrictionById(appPreferences.plotDistance)
+        main_consumption_plot.dimensionSmoothing = dimensionSmoothingById(appPreferences.plotDistance)
         main_consumption_plot.invalidate()
 
         main_charge_plot.reset()
@@ -370,6 +380,7 @@ class MainActivity : Activity() {
 
         main_charge_plot.dimension = PlotDimension.TIME
         main_charge_plot.dimensionRestriction = null
+        main_charge_plot.dimensionSmoothingPercentage = 0.01f
         main_charge_plot.invalidate()
 
         main_power_gage.gageName = getString(R.string.main_gage_power)
@@ -458,6 +469,7 @@ class MainActivity : Activity() {
             }
 
             main_consumption_plot.dimensionRestriction = dimensionRestrictionById(id)
+            main_consumption_plot.dimensionSmoothing = dimensionSmoothingById(id)
 
             appPreferences.plotDistance = id
 
