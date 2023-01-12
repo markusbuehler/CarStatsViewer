@@ -2,7 +2,7 @@ package com.mbuehler.carStatsViewer.objects
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.ixam97.carStatsViewer.R
+import com.mbuehler.carStatsViewer.R
 
 class AppPreferences(context: Context) {
 
