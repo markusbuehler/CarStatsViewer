@@ -10,7 +10,7 @@ android {
         applicationId "com.mbuehler.carStatsViewer"
         minSdkVersion 28
         targetSdkVersion 32
-        versionCode 27
+        versionCode 29
         versionName "0.18.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
