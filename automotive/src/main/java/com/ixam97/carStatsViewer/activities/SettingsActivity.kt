@@ -13,9 +13,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.view.View
-import com.ixam97.carStatsViewer.plot.PlotDimension
-import com.ixam97.carStatsViewer.plot.PlotPaint
-import com.ixam97.carStatsViewer.views.PlotView
+import com.mbuehler.carStatsViewer.plot.PlotDimension
+import com.mbuehler.carStatsViewer.plot.PlotPaint
+import com.mbuehler.carStatsViewer.views.PlotView
 import kotlin.system.exitProcess
 
 class SettingsActivity : Activity() {
