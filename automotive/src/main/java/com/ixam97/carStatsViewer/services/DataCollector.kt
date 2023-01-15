@@ -40,6 +40,8 @@ class DataCollector : Service() {
     private var lastPlotGear = VehicleGear.GEAR_PARK
     private var lastPlotMarker : PlotMarker? = null
 
+    private var lastChargePower = 0f
+
     private var notificationCounter = 0
 
     // private lateinit var sharedPref: SharedPreferences
@@ -313,10 +315,50 @@ class DataCollector : Service() {
             }
         }
 
-        if (timerTriggered(value, 2_000f, timestamp) && DataHolder.chargePortConnected) { // && DataHolder.currentPowermW < 0) {
-            DataHolder.chargePlotLine.addDataPoint(- (DataHolder.currentPowermW / 1_000_000), timestamp,0f)
-            DataHolder.stateOfChargePlotLine.addDataPoint(100f / DataHolder.maxBatteryCapacity * DataHolder.currentBatteryCapacity, timestamp, 0f)
-            sendBroadcast(Intent(getString(R.string.ui_update_plot_broadcast)))
+        if (timerTriggered(value, 5_000f, timestamp) && DataHolder.chargePortConnected) {
+            if (DataHolder.currentPowermW < 0 && lastChargePower >= 0) {
+                DataHolder.chargePlotLine.addDataPoint(0f, timestamp - 1_000_000, 0f)
+                DataHolder.chargePlotLine.addDataPoint(
+                    -(DataHolder.currentPowermW / 1_000_000),
+                    timestamp,
+                    0f,
+                    null,
+                    null,
+                    PlotMarker.BEGIN_SESSION
+                )
+                DataHolder.stateOfChargePlotLine.addDataPoint(
+                    100f / DataHolder.maxBatteryCapacity * DataHolder.currentBatteryCapacity,
+                    timestamp,
+                    0f,
+                    null,
+                    null,
+                    PlotMarker.BEGIN_SESSION
+                )
+                sendBroadcast(Intent(getString(R.string.ui_update_plot_broadcast)))
+            } else if (DataHolder.currentPowermW >= 0 && lastChargePower < 0) {
+                DataHolder.chargePlotLine.addDataPoint(
+                    -(DataHolder.currentPowermW / 1_000_000),
+                    timestamp,
+                    0f,
+                    null,
+                    null,
+                    PlotMarker.END_SESSION
+                )
+                DataHolder.stateOfChargePlotLine.addDataPoint(
+                    100f / DataHolder.maxBatteryCapacity * DataHolder.currentBatteryCapacity,
+                    timestamp,
+                    0f,
+                    null,
+                    null,
+                    PlotMarker.END_SESSION
+                )
+                sendBroadcast(Intent(getString(R.string.ui_update_plot_broadcast)))
+            } else if (DataHolder.currentPowermW < 0) {
+                DataHolder.stateOfChargePlotLine.addDataPoint(100f / DataHolder.maxBatteryCapacity * DataHolder.currentBatteryCapacity, timestamp, 0f)
+                DataHolder.chargePlotLine.addDataPoint(- (DataHolder.currentPowermW / 1_000_000), timestamp,0f)
+                sendBroadcast(Intent(getString(R.string.ui_update_plot_broadcast)))
+            }
+            lastChargePower = DataHolder.currentPowermW
         }
     }
 
