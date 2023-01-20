@@ -1,7 +1,7 @@
-package com.ixam97.carStatsViewer.objects
+package com.mbuehler.carStatsViewer.objects
 
-import com.ixam97.carStatsViewer.plot.PlotLine
-import com.ixam97.carStatsViewer.plot.PlotLineItem
+import com.mbuehler.carStatsViewer.plot.PlotLine
+import com.mbuehler.carStatsViewer.plot.PlotLineItem
 import java.util.*
 import kotlin.collections.ArrayList
 
