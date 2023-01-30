@@ -1,15 +1,13 @@
 package com.mbuehler.carStatsViewer.objects
 
-import com.mbuehler.carStatsViewer.plot.PlotLine
-import com.mbuehler.carStatsViewer.plot.PlotLineItem
-import com.mbuehler.carStatsViewer.plot.PlotLineMarkerType
-import com.mbuehler.carStatsViewer.plot.PlotMarker
-import com.mbuehler.carStatsViewer.plot.PlotMarkers
+import com.mbuehler.carStatsViewer.plot.objects.PlotLineItem
+import com.mbuehler.carStatsViewer.plot.enums.PlotLineMarkerType
+import com.mbuehler.carStatsViewer.plot.objects.PlotMarker
 import java.util.*
 
 data class TripData(
     var appVersion: String,
-    var saveDate: Date,
+    var tripStartDate: Date,
     var traveledDistance: Float,
     var usedEnergy: Float,
     var averageConsumption: Float,
@@ -21,7 +19,6 @@ data class TripData(
     var lastPlotMarker: PlotLineMarkerType?,
     var lastChargePower:Float,
     var consumptionPlotLine: List<PlotLineItem>,
-    var speedPlotLine: List<PlotLineItem>,
     var chargeCurves: List<ChargeCurve>,
     var markers: List<PlotMarker>
 ) {

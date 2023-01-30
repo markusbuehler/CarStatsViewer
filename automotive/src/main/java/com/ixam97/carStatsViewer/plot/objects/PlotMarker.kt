@@ -1,4 +1,6 @@
-package com.mbuehler.carStatsViewer.plot
+package com.mbuehler.carStatsViewer.plot.objects
+
+import com.mbuehler.carStatsViewer.plot.enums.PlotMarkerType
 
 class PlotMarkers {
     val markers : ArrayList<PlotMarker> = ArrayList()
