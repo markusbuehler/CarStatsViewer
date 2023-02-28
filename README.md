@@ -18,15 +18,17 @@ Currently the app is not available in the public Play Store. This is due to stri
 Once the app has reached a more finished state I will try to reach out to Polestar directly to potentially make it available through them. Just like ABRP or the Vivaldi browser which also do not comply with Google's restrictions.
 
 ## Support the development of the app:
-Any form of support and feedback is very welcome! If you like the app and want to buy me a beer, feel free (but never obliged! This is a hobby for me) to use this link: https://paypal.me/Ixam
+Any form of support and feedback is very welcome! If you like the app and want to buy me a beer, feel free (but never obliged! This is a hobby for me) to use this link: https://paypal.me/Ixam </br>
+Please let me now if you do not want to be listed in the supporters list.
 
 <b>Many thanks to everyone who has supported the development of Car Stats Viewer!</b>
 <details>
 <summary><h3>Supporters</h3></summary>
 
- * Ahti Hinnov </br>
- * Robin Hellström
- * Benjamin Stegmann 
+ * Ahti Hinnov
+ * Robin Hellström 
+ * Benjamin Stegmann
+ * Horst Zimmermann
 
 </details>
 
@@ -46,6 +48,7 @@ Currently the following languages are already available:
  - :netherlands: Dutch
  - :sweden: Swedish
  - :norway: Norwegian
+ - :denmark: Danish
 
 ### Rules for contributing code:
 <details>
@@ -53,7 +56,7 @@ Currently the following languages are already available:
 <summary>Please read before contributing and creating Pull Requests!</summary>
 
 
-- If you want to contribute code you are very welcome to. When creating a Pull Request, make sure to use [active_development](https://github.com/Ixam97/CarStatsViewer/tree/active_development). With the exception of hotfixes I will not merge any PRs into master since that branch is used by other forks to build the app bundle for the Play Store.
+- If you want to contribute code you are very welcome to. When creating a Pull Request, make sure to use [active_development](https://github.com/mbuehler/CarStatsViewer/tree/active_development). With the exception of hotfixes I will not merge any PRs into master since that branch is used by other forks to build the app bundle for the Play Store.
 
 - Also describe what you want to archive with your code contribution. Uncommented PRs with no context on what they do are hard to understand and review. To make it easyer for me to review and test your contribution make sure to [allow edits from maintainers](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork). </br>
 Please also be aware that I will not just include everything. It has to fit into my goals I want to archive with this app. I may just say "I don't feel it" (yes, I konw, this joke is getting old 😅). It would be best to open an issue beforehand, describing what you want to see in the app and offer your help before starting to code. This way it is possible to exchange ideas before spending hours in coding.
@@ -65,6 +68,7 @@ Please also be aware that I will not just include everything. It has to fit into
 - Dutch translation: DoubleYouEl
 - Swedish translation: Robin Hellström, jschlyter
 - Norwegian translation: Oddvarr
+- Danish translation: Emil Blixt Hansen
 - FreshDave29
 - rdu
 
@@ -72,13 +76,25 @@ Please also be aware that I will not just include everything. It has to fit into
 
 Original impulse cam from here: [CarGearViewerKotlin](https://github.com/android/car-samples/tree/main/car-lib/CarGearViewerKotlin)
 
-Discussion in the german Polestar forums: [Polestar Club](https://polestar.fans/t/car-stats-viewer-0-22-x/14653)
+Discussion in the german Polestar forums: [Polestar Club](https://polestar.fans/t/car-stats-viewer-0-23-x/14983)
 
 Discussion in the international Polestar forums: [Polestar Forum](https://www.polestar-forum.com/threads/car-stats-viewer-a-better-range-assistant.10261/)
 
 ---
 
 ## Changelog [DE]:
+
+### 0.23.0 (24.02.2023)
+- Datenstruktur grundlegend überarbeitet, um die Stabilität und Sklaierbarkeit zu verbessern
+- Dänische Übersetzung hinzugefügt
+- "Über Car Stats Viewer" hinzugefügt, (inkl. grundlegende Überarbeitung der ReadMe mit Hinweisen zur Unterstützung und Mitwirkung)
+- Es können neben dem manuellen Trip mehrere, automatisch zurückgesetzte Trips ausgewählt werden
+- Verschiedene optische Anpassungen an den Diagrammen
+- Einzelne Werte eines Diagramms können per Doppeltipp hervorgehoben werden
+- Möglichkeit zum verschicken von Debug-Logs per SMTP (experimentell!)
+- Stabilisierung des Verhaltens der Ladekurve, wenn die Ausführung der App zwischenzeitlich unterbrochen wird
+- Optimierung der Fahrerablenkung
+- Zahlreiche weitere Bugfixes und Stabilitätsverbesserungen.
 
 ### 0.22.1 (02.02.2023)
 - Falsche Lokalisierung für Norwegisch behoben.
