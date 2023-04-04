@@ -1,6 +1,6 @@
 package com.mbuehler.carStatsViewer.plot.enums
 
-enum class PlotDimension {
+enum class PlotDimensionX {
     INDEX, DISTANCE, TIME, STATE_OF_CHARGE;
 
     fun toPlotDirection(): PlotDirection {

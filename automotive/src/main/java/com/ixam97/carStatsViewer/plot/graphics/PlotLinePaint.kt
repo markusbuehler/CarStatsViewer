@@ -1,20 +1,20 @@
 package com.mbuehler.carStatsViewer.plot.graphics
 
-import com.mbuehler.carStatsViewer.plot.enums.PlotSecondaryDimension
+import com.mbuehler.carStatsViewer.plot.enums.PlotDimensionY
 
 class PlotLinePaint(
-    private val primary : PlotPaint,
-    private val secondaryNormal : PlotPaint,
-    private val secondaryAlternative : PlotPaint,
-    private var useSecondaryAlternative: () -> Boolean
+    private val xAxis : PlotPaint,
+    private val yAxisNormal : PlotPaint,
+    private val yAxisAlternative : PlotPaint,
+    private var useYAxisAlternative: () -> Boolean
 ) {
-    fun bySecondaryDimension(secondaryDimension: PlotSecondaryDimension?) : PlotPaint {
+    fun bySecondaryDimension(secondaryDimension: PlotDimensionY?) : PlotPaint {
         return when {
             secondaryDimension != null -> when {
-                useSecondaryAlternative.invoke() -> secondaryAlternative
-                else -> secondaryNormal
+                useYAxisAlternative.invoke() -> yAxisAlternative
+                else -> yAxisNormal
             }
-            else -> primary
+            else -> xAxis
         }
     }
 }
