@@ -13,6 +13,7 @@ import com.mbuehler.carStatsViewer.appPreferences.AppPreferences
 import com.mbuehler.carStatsViewer.dataManager.DataManager
 import com.mbuehler.carStatsViewer.dataManager.DrivingState
 import com.mbuehler.carStatsViewer.liveData.LiveDataApi
+import com.mbuehler.carStatsViewer.liveData.abrpLiveData.AbrpLiveData
 import com.mbuehler.carStatsViewer.utils.InAppLogger
 import java.io.DataOutputStream
 import java.net.HttpURLConnection
@@ -23,7 +24,7 @@ import java.util.*
 
 class HttpLiveData (
     detailedLog : Boolean = true
-): LiveDataApi("com.mbuehler.carStatsViewer_dev.http_live_data_connection_broadcast", detailedLog) {
+): LiveDataApi("com.mbuehler.carStatsViewer.http_live_data_connection_broadcast", detailedLog) {
 
 
     private fun addBasicAuth(connection: HttpURLConnection, username: String, password: String) {
@@ -162,7 +163,10 @@ class HttpLiveData (
                 // Helpers
                 isCharging = dataManager.chargePortConnected,
                 isParked = (dataManager.driveState == DrivingState.PARKED || dataManager.driveState == DrivingState.CHARGE),
-                isFastCharging = (dataManager.chargePortConnected && dataManager.currentPower < -11_000_000)
+                isFastCharging = (dataManager.chargePortConnected && dataManager.currentPower < -11_000_000),
+
+                // ABRP debug
+                abrpPackage = (CarStatsViewer.liveDataApis[0] as AbrpLiveData).lastPackage
             )
         )
     }
