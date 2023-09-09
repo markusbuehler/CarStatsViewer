@@ -2,18 +2,43 @@ package com.mbuehler.carStatsViewer
 
 import android.app.*
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Typeface
+import android.graphics.fonts.SystemFonts
 import android.util.TypedValue
+import android.view.LayoutInflater
+import android.widget.TextView
+import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mbuehler.carStatsViewer.appPreferences.AppPreferences
-import com.mbuehler.carStatsViewer.dataManager.DataManager
-import com.mbuehler.carStatsViewer.dataManager.TripData
-import com.mbuehler.carStatsViewer.liveData.LiveDataApi
-import com.mbuehler.carStatsViewer.liveData.abrpLiveData.AbrpLiveData
-import com.mbuehler.carStatsViewer.liveData.http.HttpLiveData
+import com.mbuehler.carStatsViewer.dataProcessor.DataProcessor
+import com.mbuehler.carStatsViewer.database.log.LogDao
+import com.mbuehler.carStatsViewer.database.log.LogDatabase
+import com.mbuehler.carStatsViewer.database.tripData.*
+import com.mbuehler.carStatsViewer.liveDataApi.LiveDataApi
+import com.mbuehler.carStatsViewer.liveDataApi.abrpLiveData.AbrpLiveData
+import com.mbuehler.carStatsViewer.liveDataApi.http.HttpLiveData
+import com.mbuehler.carStatsViewer.ui.plot.graphics.PlotPaint
+import com.mbuehler.carStatsViewer.ui.views.MultiButtonWidget
 import com.mbuehler.carStatsViewer.utils.InAppLogger
+import com.mbuehler.carStatsViewer.utils.Watchdog
+import com.mbuehler.carStatsViewer.utils.applyTypeface
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
+import kotlin.system.exitProcess
 
 var emulatorMode = false
 var emulatorPowerSign = -1
+
+object Defines {
+    const val PLOT_ENERGY_INTERVAL = 100L
+    const val AUTO_RESET_TIME = 14_400_000L // 4h
+    const val PLOT_DISTANCE_INTERVAL = 100.0
+}
 
 class CarStatsViewer : Application() {
 
@@ -22,6 +47,8 @@ class CarStatsViewer : Application() {
         const val RESTART_NOTIFICATION_ID = 1
         const val FOREGROUND_CHANNEL_ID = "ForegroundChannel"
         const val FOREGROUND_NOTIFICATION_ID = 2
+
+        var screenshotBitmap: Bitmap? = null
 
         lateinit var appContext: Context
         lateinit var liveDataApis: ArrayList<LiveDataApi>
@@ -32,30 +59,204 @@ class CarStatsViewer : Application() {
 
         var foregroundServiceStarted = false
         var restartNotificationDismissed = false
+        var restartReason: String? = null
 
-        var tripData: TripData? = null
-        var dataManager: DataManager? = null
+        lateinit var tripDatabase: TripDataDatabase
+        lateinit var tripDataSource: LocalTripDataSource
+        lateinit var dataProcessor: DataProcessor
+        lateinit var watchdog: Watchdog
 
+        lateinit var logDao: LogDao
 
+        var typefaceRegular: Typeface? = null
+        var typefaceMedium: Typeface? = null
+        var isPolestarTypeface = false
 
-        // lateinit var tripDatabase: TripDataDatabase
-        // lateinit var tripDao: TripDao
+        val appContextIsInitialized: Boolean get() = this::appContext.isInitialized
 
+        fun setupRestartAlarm(context: Context, reason: String, delay: Long, cancel: Boolean = false, extendedLogging: Boolean = false) {
+            val serviceIntent = Intent(context, AutoStartReceiver::class.java)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            serviceIntent.action = "com.mbuehler.carStatsViewer.RestartAction"
+            serviceIntent.putExtra("reason", reason)
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                0,
+                serviceIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            alarmManager.cancel(pendingIntent)
+            if (cancel) return
+            if (delay < 10_000) {
+                alarmManager.set(
+                    AlarmManager.RTC,
+                    System.currentTimeMillis() + delay,
+                    pendingIntent
+                )
+                InAppLogger.i("[ASR] Setup single shot alarm")
+            } else {
+                alarmManager.setRepeating(
+                    AlarmManager.RTC,
+                    System.currentTimeMillis() + delay,
+                    delay,
+                    pendingIntent
+                )
+                if (extendedLogging) InAppLogger.i("[ASR] Setup repeating alarm")
+            }
+        }
+
+        fun getChangelogDialog(context: Context): AlertDialog.Builder {
+            return AlertDialog.Builder(context).apply {
+                setPositiveButton(context.getString(R.string.dialog_close)) { dialog, _ ->
+                    dialog.cancel()
+                }
+                // setTitle(context.getString(R.string.main_changelog_dialog_title, BuildConfig.VERSION_NAME.dropLast(5)))
+
+                val layout = LayoutInflater.from(context).inflate(R.layout.dialog_changelog, null)
+
+                val changelog1Title = layout.findViewById<TextView>(R.id.changes_0_25_1_title)
+                val changelog1TextView = layout.findViewById<TextView>(R.id.changes_0_25_1)
+                val changelog2Title = layout.findViewById<TextView>(R.id.changes_0_25_0_title)
+                val changelog2TextView = layout.findViewById<TextView>(R.id.changes_0_25_0)
+
+                changelog1Title.text = context.getString(R.string.main_changelog_dialog_title, "0.25.1")
+                changelog2Title.text = context.getString(R.string.main_changelog_dialog_title, "0.25.0")
+
+                val changesArray = context.resources.getStringArray(R.array.changes_0_25_1)
+                var changelog1 = ""
+                changesArray.forEachIndexed { index, change ->
+                    changelog1 += "• $change"
+                    if (index < changesArray.size - 1) changelog1 += "\n\n"
+                }
+
+                val changesArrayOld = context.resources.getStringArray(R.array.changes_0_25_0)
+                var changelog2 = ""
+                changesArrayOld.forEachIndexed { index, change ->
+                    changelog2 += "• $change"
+                    if (index < changesArrayOld.size - 1) changelog2 += "\n\n"
+                }
+                //setMessage(changelog)
+
+                changelog1TextView.text = changelog1
+                changelog2TextView.text = changelog2
+
+                applyTypeface(layout)
+
+                setView(layout)
+
+                setCancelable(true)
+                create()
+            }
+        }
     }
 
-    // val dataProcessor = DataProcessor()
+
 
     override fun onCreate() {
         super.onCreate()
-/*
+
+        appContext = applicationContext
+        appPreferences = AppPreferences(applicationContext)
+        watchdog = Watchdog()
+
+        val logDatabase = Room.databaseBuilder(
+            applicationContext,
+            LogDatabase::class.java,
+            "LogDatabase"
+        ).build()
+        logDao = logDatabase.logDao()
+
+        Thread.setDefaultUncaughtExceptionHandler { t, e ->
+
+            try {
+                setupRestartAlarm(applicationContext, "crash", 2_000, extendedLogging = true)
+                InAppLogger.i("setup crash alarm")
+            } catch (e: Exception) {
+                InAppLogger.e(e.stackTraceToString())
+            }
+
+            InAppLogger.e("[NEO] Car Stats Viewer has crashed!\n ${e.stackTraceToString()}")
+            val crashTime = System.nanoTime()
+            while (System.nanoTime() < crashTime + 500_000_000) {
+                // Give the logger some time
+            }
+            InAppLogger.e("exit")
+            exitProcess(0)
+        }
+
+        InAppLogger.i("${appContext.getString(R.string.app_name)} v${BuildConfig.VERSION_NAME} started")
+
+        InAppLogger.d("Screen width: ${resources.configuration.screenWidthDp}dp")
+
+        var fontsLoaded = false
+
+        CoroutineScope(Dispatchers.IO).launch {
+            InAppLogger.i("Available OEM fonts:")
+            val systemFonts = SystemFonts.getAvailableFonts()
+            systemFonts.filter{ it.file?.name?.contains("volvo", true) == true }.forEach {
+                InAppLogger.i("    ${it.file?.name}")
+                when {
+                    it.file?.name?.contains("light", true) == true -> typefaceRegular = Typeface.Builder(it.file!!).build()
+                    it.file?.name?.contains("medium", true) == true -> typefaceMedium = Typeface.Builder(it.file!!).build()
+                }
+            }
+            systemFonts.filter{ it.file?.name?.contains("polestar", true) == true }.forEach {
+                InAppLogger.i("    ${it.file?.name}")
+                isPolestarTypeface = true
+                when {
+                    it.file?.name?.contains("regular", true) == true -> typefaceRegular = Typeface.Builder(it.file!!).build()
+                    it.file?.name?.contains("medium", true) == true -> typefaceMedium = Typeface.Builder(it.file!!).build()
+                }
+            }
+            systemFonts.filter { it.file?.name?.contains("honda", true) == true }.forEach {
+                InAppLogger.i("    ${it.file?.name}")
+                when {
+                    it.file?.name?.contains("regular", true) == true -> {
+                        typefaceRegular = Typeface.Builder(it.file!!).build()
+                        typefaceMedium = Typeface.Builder(it.file!!).build()
+                    }
+                }
+            }
+            fontsLoaded = true
+        }
+
+        while (!fontsLoaded) {
+            // Wait for fonts to be loaded before initializing trip database
+        }
+
+        MultiButtonWidget.isPolestar = isPolestarTypeface
+
+        typefaceRegular?.let {
+            PlotPaint.typeface = it
+            PlotPaint.letterSpacing = -0.025f
+        }
+
+        val MIGRATION_5_6 = object: Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE DrivingSession ADD COLUMN last_edited_epoch_time INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         tripDatabase = Room.databaseBuilder(
             applicationContext,
             TripDataDatabase::class.java,
             "TripDatabase"
-        ).build()
-        tripDao = tripDatabase.tripDao()
+        )
+            //.fallbackToDestructiveMigration()
+            .addMigrations(MIGRATION_5_6)
+            .build()
 
- */
+        tripDataSource = LocalTripDataSource(tripDatabase.tripDao())
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            // tripDatabase.clearAllTables()
+
+            val drivingSessionIds = tripDataSource.getActiveDrivingSessionsIdsMap()
+            InAppLogger.d("Trip Database: $drivingSessionIds")
+        }
+
+        dataProcessor = DataProcessor()
 
         val typedValue = TypedValue()
         applicationContext.theme.resolveAttribute(android.R.attr.colorControlActivated, typedValue, true)
@@ -69,11 +270,6 @@ class CarStatsViewer : Application() {
         //         .detectLeakedClosableObjects()
         //         .build()
         // )
-
-        appContext = applicationContext
-        appPreferences = AppPreferences(applicationContext)
-
-        InAppLogger.i("${appContext.getString(R.string.app_name)} v${BuildConfig.VERSION_NAME} started")
 
         val abrpApiKey = if (resources.getIdentifier("abrp_api_key", "string", applicationContext.packageName) != 0) {
             getString(resources.getIdentifier("abrp_api_key", "string", applicationContext.packageName))

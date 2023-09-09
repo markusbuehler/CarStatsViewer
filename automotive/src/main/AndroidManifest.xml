@@ -29,10 +29,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:hasFragileUserData="true"
-        android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+        android:theme="@style/AppTheme">
         <receiver android:name=".AutoStartReceiver"
             android:exported="true"
             android:enabled="true"
@@ -48,7 +47,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activities.PermissionsActivity"
+        <activity android:name=".ui.activities.PermissionsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,28 +55,25 @@
             </intent-filter>
             <meta-data android:name="distractionOptimized" android:value="true"/>
         </activity>
-        <activity android:name=".activities.MainActivity"
+        <activity android:name=".ui.activities.MainActivity"
             android:exported="false">
             <meta-data android:name="distractionOptimized" android:value="true"/>
         </activity>
-        <activity android:name=".activities.SummaryActivity"
+        <activity android:name=".ui.activities.SettingsActivity"
             android:exported="false">
             <meta-data android:name="distractionOptimized" android:value="true"/>
         </activity>
-        <activity android:name=".activities.SettingsActivity"
+        <activity android:name=".ui.activities.HistoryActivity" android:exported="false" />
+        <activity android:name=".ui.activities.SettingsMainViewActivity" android:exported="false"/>
+        <activity android:name=".ui.activities.SettingsVehicleActivity" android:exported="false"/>
+        <activity android:name=".ui.activities.LibsActivity" android:exported="false" />
+        <activity android:name=".ui.activities.AboutActivity" android:exported="false" />
+        <activity android:name=".ui.activities.SettingsApisActivity" android:exported="false" />
+        <activity android:name=".ui.activities.DebugActivity"
             android:exported="false">
             <meta-data android:name="distractionOptimized" android:value="true"/>
         </activity>
-        <activity android:name=".activities.SettingsMainViewActivity" android:exported="false"/>
-        <activity android:name=".activities.SettingsVehicleActivity" android:exported="false"/>
-        <activity android:name=".activities.LibsActivity" android:exported="false" />
-        <activity android:name=".activities.AboutActivity" android:exported="false" />
-        <activity android:name=".activities.SettingsApisActivity" android:exported="false" />
-        <activity android:name=".activities.LogActivity"
-            android:exported="false">
-            <meta-data android:name="distractionOptimized" android:value="true"/>
-        </activity>
-        <service android:name=".dataManager.DataCollector"
+        <service android:name=".dataCollector.DataCollector"
             android:foregroundServiceType="location"
             android:enabled="true"
             android:exported="true"/>
