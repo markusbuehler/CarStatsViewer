@@ -3,6 +3,7 @@ package com.mbuehler.carStatsViewer.ui.activities
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.FragmentActivity
 import com.mbuehler.carStatsViewer.CarStatsViewer
 import com.mbuehler.carStatsViewer.R
 import com.mbuehler.carStatsViewer.utils.VehicleDefinitions
@@ -10,7 +11,7 @@ import com.mbuehler.carStatsViewer.utils.applyTypeface
 import kotlinx.android.synthetic.main.activity_settings_vehicle.*
 import kotlinx.coroutines.*
 
-class SettingsVehicleActivity : Activity() {
+class SettingsVehicleActivity : FragmentActivity() {
 
     val appPreferences = CarStatsViewer.appPreferences
 

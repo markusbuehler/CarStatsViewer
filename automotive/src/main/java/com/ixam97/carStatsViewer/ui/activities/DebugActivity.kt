@@ -6,7 +6,7 @@ import android.util.Patterns
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Switch
+import android.widget.CheckBox
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -22,6 +22,7 @@ import com.mbuehler.carStatsViewer.database.tripData.TripType
 import com.mbuehler.carStatsViewer.mailSender.MailSender
 import com.mbuehler.carStatsViewer.adapters.LogAdapter
 import com.mbuehler.carStatsViewer.ui.views.MultiSelectWidget
+import com.mbuehler.carStatsViewer.ui.views.SnackbarWidget
 import com.mbuehler.carStatsViewer.utils.*
 import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.*
@@ -102,6 +103,7 @@ class DebugActivity : FragmentActivity() {
                 log_progress_bar.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.Default).launch() {
                     try {
+                        // throw Exception("Test")
                         val sender = if (appPreferences.smtpAddress != "" && appPreferences.smtpPassword != "" && appPreferences.smtpServer != "") {
                             senderMail = appPreferences.smtpAddress
                             MailSender(appPreferences.smtpAddress, appPreferences.smtpPassword, appPreferences.smtpServer)
@@ -126,8 +128,8 @@ class DebugActivity : FragmentActivity() {
                             content = InAppLogger.getLogString(appPreferences.logLevel + 2, logLengths[appPreferences.logLength]),
                             fileName ="log_${System.currentTimeMillis()}.txt")
 
-                        CarStatsViewer.screenshotBitmap?.let {
-                            sender.addAttachment(it, "Screenshot")
+                        CarStatsViewer.screenshotBitmap.forEachIndexed { index, bitmap ->
+                            sender.addAttachment(bitmap, "Screenshot_$index")
                         }
 
                         if (checkbox_send_current_trips.isChecked) {
@@ -152,14 +154,24 @@ class DebugActivity : FragmentActivity() {
 
                         sender.sendMail("Debug Log ${Date()} from $senderName", "See attachments.", senderMail, mailAdr)
 
+                        CarStatsViewer.screenshotBitmap.clear()
+
                         runOnUiThread {
                             log_progress_bar.visibility = View.GONE
-                            Toast.makeText(this@DebugActivity, "Log sent to $mailAdr", Toast.LENGTH_LONG).show()
+                            SnackbarWidget.Builder(this@DebugActivity, "Log sent to $mailAdr")
+                                .setDuration(3_000)
+                                .setStartDrawable(R.drawable.ic_mail)
+                                .show()
+                            // Toast.makeText(this@DebugActivity, "Log sent to $mailAdr", Toast.LENGTH_LONG).show()
                         }
                     } catch (e: java.lang.Exception) {
                         runOnUiThread {
                             log_progress_bar.visibility = View.GONE
-                            Toast.makeText(this@DebugActivity, "Sending E-Mail failed. See log.", Toast.LENGTH_LONG).show()
+                            SnackbarWidget.Builder(this@DebugActivity, "Sending E-Mail failed. See log.")
+                                .setDuration(3_000)
+                                .setIsError(true)
+                                .show()
+                            // Toast.makeText(this@DebugActivity, "Sending E-Mail failed. See log.", Toast.LENGTH_LONG).show()
                         }
                         InAppLogger.e(e.stackTraceToString())
                     }
@@ -201,11 +213,13 @@ class DebugActivity : FragmentActivity() {
             val settingsDialog = AlertDialog.Builder(ContextThemeWrapper(this, R.style.redTextEdit)).apply {
                 val layout = LayoutInflater.from(context).inflate(R.layout.dialog_debug_settings, null)
 
-                val debug_miles_switch = layout.findViewById<Switch>(R.id.debug_miles_switch)
+                val debug_miles_checkbox = layout.findViewById<CheckBox>(R.id.debug_miles_switch)
+                val debug_screenshot_checkbox = layout.findViewById<CheckBox>(R.id.debug_screenshot_switch)
                 val log_level_multiselect = layout.findViewById<MultiSelectWidget>(R.id.debug_level_multiselect)
                 val log_length_multiselect = layout.findViewById<MultiSelectWidget>(R.id.debug_length_multiselect)
 
-                debug_miles_switch.isChecked = appPreferences.distanceUnit == DistanceUnitEnum.MILES
+                debug_miles_checkbox.isChecked = appPreferences.distanceUnit == DistanceUnitEnum.MILES
+                debug_screenshot_checkbox.isChecked = appPreferences.showScreenshotButton
 
                 log_level_multiselect.entries = arrayListOf<String>(
                     "Verbose",
@@ -234,12 +248,16 @@ class DebugActivity : FragmentActivity() {
                     appPreferences.logLength = log_length_multiselect.selectedIndex
                 }
 
-                debug_miles_switch.setOnClickListener {
-                    appPreferences.distanceUnit = if (debug_miles_switch.isChecked) {
+                debug_miles_checkbox.setOnClickListener {
+                    appPreferences.distanceUnit = if (debug_miles_checkbox.isChecked) {
                         DistanceUnitEnum.MILES
                     } else {
                         DistanceUnitEnum.KM
                     }
+                }
+
+                debug_screenshot_checkbox.setOnClickListener {
+                    appPreferences.showScreenshotButton = debug_screenshot_checkbox.isChecked
                 }
 
                 setView(layout)

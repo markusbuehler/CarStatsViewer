@@ -1,7 +1,10 @@
 package com.mbuehler.carStatsViewer.liveDataApi.http
 
+import com.mbuehler.carStatsViewer.database.tripData.ChargingSession
+import com.mbuehler.carStatsViewer.database.tripData.DrivingPoint
+
 data class HttpDataSet(
-    val apiVersion: Int = 2,
+    val apiVersion: String = "2.1",
     val appVersion: String,
     val timestamp: Long,
     val speed: Float,
@@ -17,5 +20,8 @@ data class HttpDataSet(
     val alt: Float?,
 
     // ABRP debug
-    val abrpPackage: String? = null
+    val abrpPackage: String? = null,
+
+    val drivingPoints: List<DrivingPoint>? = null,
+    val chargingSessions: List<ChargingSession>? = null
 )

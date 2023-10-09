@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
 import android.widget.DatePicker
+import android.widget.FrameLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +19,10 @@ import com.mbuehler.carStatsViewer.database.tripData.DrivingSession
 import com.mbuehler.carStatsViewer.ui.fragments.SummaryFragment
 import com.mbuehler.carStatsViewer.utils.InAppLogger
 import com.mbuehler.carStatsViewer.adapters.TripHistoryAdapter
+import com.mbuehler.carStatsViewer.database.tripData.DrivingPoint
+import com.mbuehler.carStatsViewer.liveDataApi.LiveDataApi
+import com.mbuehler.carStatsViewer.liveDataApi.http.HttpLiveData
+import com.mbuehler.carStatsViewer.ui.views.SnackbarWidget
 import com.mbuehler.carStatsViewer.ui.views.TripHistoryRowWidget
 import com.mbuehler.carStatsViewer.utils.applyTypeface
 import kotlinx.android.synthetic.main.activity_history.*
@@ -99,6 +104,10 @@ class HistoryActivity  : FragmentActivity() {
 
         CarStatsViewer.typefaceMedium?.let {
             applyTypeface(history_activity)
+        }
+
+        history_button_upload.setOnClickListener {
+            openUploadDialog()
         }
 
     }
@@ -205,6 +214,11 @@ class HistoryActivity  : FragmentActivity() {
             .setCancelable(true)
             .setPositiveButton(getString(R.string.history_dialog_delete_confirm)) {_,_->
                 tripsAdapter.deleteTrip(session, position)
+                SnackbarWidget.Builder(this@HistoryActivity, "Trip has been deleted.")
+                    .setDuration(3000)
+                    .setButton("OK")
+                    .setStartDrawable(R.drawable.ic_delete)
+                    .show()
             }
             .setNegativeButton(getString(R.string.dialog_reset_cancel)) { dialog, _ ->
                 dialog.cancel()
@@ -224,6 +238,7 @@ class HistoryActivity  : FragmentActivity() {
             .setCancelable(true)
             .setPositiveButton(getString(R.string.history_dialog_multi_delete_delete, selectedIds.size.toString())) {_,_->
                 lifecycleScope.launch { withContext(Dispatchers.IO) {
+                    val numSelected = selectedIds.size
                     runOnUiThread { trip_history_progress_bar.visibility = View.VISIBLE }
                     selectedIds.forEach {
                         CarStatsViewer.tripDataSource.deleteDrivingSessionById(it)
@@ -233,6 +248,11 @@ class HistoryActivity  : FragmentActivity() {
                     runOnUiThread {
                         multiSelectMode = false
                         trip_history_progress_bar.visibility = View.GONE
+                        SnackbarWidget.Builder(this@HistoryActivity, "$numSelected trips have been deleted.")
+                            .setDuration(3000)
+                            .setButton("OK")
+                            .setStartDrawable(R.drawable.ic_delete)
+                            .show()
                     }
                 }}
             }
@@ -341,5 +361,65 @@ class HistoryActivity  : FragmentActivity() {
                 history_button_filters.setImageDrawable(getDrawable(R.drawable.ic_filter))
             }
         }
+    }
+
+    private fun openUploadDialog() {
+        var uploadDialog = AlertDialog.Builder(this@HistoryActivity).apply {
+            setTitle("Upload database to API")
+            setMessage("You are about to upload the entire local database to the API endpoint"+
+                    " specified in the HTTP webhook settings!\n\nMake sure you have reset the"+
+                    " data on the server before this to prevent data duplication. If supported by" +
+                    " the API endpoint this will happen automatically \n\n" +
+                    " This action may take a long time to finish depending on the database size." +
+                    " Please remain on this page until a notification is shown!")
+            setNegativeButton("Cancel") { _,_ ->
+
+            }
+            setPositiveButton("Upload") { _, _ ->
+                uploadDatabase()
+            }
+        }
+        uploadDialog.show()
+    }
+
+    private fun uploadDatabase() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val waitSnack = SnackbarWidget.Builder(this@HistoryActivity, "Upload in progress...")
+                .build()
+            runOnUiThread {
+                this@HistoryActivity.window.findViewById<FrameLayout>(android.R.id.content).addView(waitSnack)
+            }
+            val drivingPoints = CarStatsViewer.tripDataSource.getAllDrivingPoints()
+            InAppLogger.i("[HIST] Done loading ${drivingPoints.size} driving points")
+            val chargingSessions = CarStatsViewer.tripDataSource.getAllChargingSessions()
+            InAppLogger.i("[HIST] Done loading ${chargingSessions.size} charging sessions")
+
+            val result = (CarStatsViewer.liveDataApis[1] as HttpLiveData).sendWithDrivingPoint(
+                CarStatsViewer.dataProcessor.realTimeData,
+                drivingPoints,
+                chargingSessions
+            )
+
+            runOnUiThread {
+                this@HistoryActivity.window.findViewById<FrameLayout>(android.R.id.content).removeView(waitSnack)
+                when (result) {
+                    LiveDataApi.ConnectionStatus.CONNECTED, LiveDataApi.ConnectionStatus.LIMITED -> {
+                        SnackbarWidget.Builder(this@HistoryActivity, "Database uploaded successfully.")
+                            .setIsError(false)
+                            .setDuration(3000)
+                            .setStartDrawable(R.drawable.ic_upload)
+                            .show()
+                    }
+                    else ->{
+                        SnackbarWidget.Builder(this@HistoryActivity, "Database upload failed.")
+                            .setIsError(true)
+                            .setDuration(3000)
+                            .show()
+                    }
+                }
+            }
+
+        }
+
     }
 }

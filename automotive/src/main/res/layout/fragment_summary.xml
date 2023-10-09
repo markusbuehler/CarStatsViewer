@@ -17,9 +17,12 @@
         <ImageButton
             android:id="@+id/summary_button_back"
             style="@style/title_back_button_style"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
             android:src="@drawable/ic_close"/>
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/summary_type_icon"
             android:layout_marginStart="10dp"
             android:layout_gravity="center_vertical"
@@ -30,7 +33,8 @@
         <TextView
             android:id="@+id/summary_title"
             android:text="@string/summary_title"
-            style="@style/title_text_style"/>
+            style="@style/title_text_style"
+            android:layout_height="wrap_content"/>
         <LinearLayout
             android:visibility="gone"
             android:id="@+id/summary_trip_selector"
@@ -109,10 +113,7 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="?android:attr/colorControlActivated"/>
+    <View style="@style/action_bar_line"/>
 
     <TextView
         android:id="@+id/summary_parked_warning"
@@ -145,6 +146,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_multibutton"
                 app:numButtons="2"
                 app:textButton1="@string/summary_trip_history"
                 app:textButton2="@string/summary_charging_sessions"
@@ -166,7 +168,10 @@
                     android:visibility="gone"
                     android:id="@+id/summary_consumption_plot"
                     android:layout_width="match_parent"
-                    android:layout_height="550dp"/>
+                    android:layout_height="550dp"
+                    app:baseTextSize="@dimen/reduced_font_size"
+                    app:xMargin="@dimen/plot_x_margin"
+                    app:yMargin="@dimen/plot_y_margin"/>
 
                 <RelativeLayout
                     android:id="@+id/summary_progress_bar"
@@ -175,6 +180,7 @@
                     android:layout_height="550dp">
                     <ProgressBar
                         android:visibility="visible"
+                        android:indeterminateTint="@color/primary_40"
                         android:layout_centerInParent="true"
                         android:layout_width="200dp"
                         android:layout_height="200dp"/>
@@ -322,7 +328,10 @@
                 <com.mbuehler.carStatsViewer.ui.views.PlotView
                     android:id="@+id/summary_charge_plot_view"
                     android:layout_width="match_parent"
-                    android:layout_height="550dp"/>
+                    android:layout_height="550dp"
+                    app:baseTextSize="@dimen/reduced_font_size"
+                    app:xMargin="@dimen/plot_x_margin"
+                    app:yMargin="@dimen/plot_y_margin"/>
 
                 <View
                     style="@style/menu_divider_style"

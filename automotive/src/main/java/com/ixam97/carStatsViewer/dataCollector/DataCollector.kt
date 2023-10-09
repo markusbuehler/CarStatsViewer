@@ -3,6 +3,7 @@ package com.mbuehler.carStatsViewer.dataCollector
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
+import android.car.VehicleUnit
 import android.content.Intent
 import android.location.Location
 import android.os.IBinder
@@ -18,6 +19,7 @@ import com.mbuehler.carStatsViewer.dataProcessor.DataProcessor
 import com.mbuehler.carStatsViewer.emulatorMode
 import com.mbuehler.carStatsViewer.locationClient.DefaultLocationClient
 import com.mbuehler.carStatsViewer.locationClient.LocationClient
+import com.mbuehler.carStatsViewer.utils.DistanceUnitEnum
 import com.mbuehler.carStatsViewer.utils.InAppLogger
 import com.mbuehler.carStatsViewer.utils.StringFormatters
 import com.mbuehler.carStatsViewer.utils.WatchdogState
@@ -71,7 +73,7 @@ class DataCollector: Service() {
         foregroundServiceNotification = Notification.Builder(applicationContext, CarStatsViewer.FOREGROUND_CHANNEL_ID)
             // .setContentTitle(getString(R.string.app_name))
             .setContentTitle(getString(R.string.foreground_service_info))
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification_diagram)
             .setOngoing(true)
 
         foregroundServiceNotification.setContentIntent(
@@ -106,7 +108,11 @@ class DataCollector: Service() {
         dataProcessor.staticVehicleData = dataProcessor.staticVehicleData.copy(
             batteryCapacity = carPropertiesClient.getFloatProperty(CarProperties.INFO_EV_BATTERY_CAPACITY),
             vehicleMake = carPropertiesClient.getStringProperty(CarProperties.INFO_MAKE),
-            modelName = carPropertiesClient.getStringProperty(CarProperties.INFO_MODEL)
+            modelName = carPropertiesClient.getStringProperty(CarProperties.INFO_MODEL),
+            distanceUnit = when (carPropertiesClient.getIntProperty(CarProperties.DISTANCE_DISPLAY_UNITS)) {
+                VehicleUnit.MILE -> DistanceUnitEnum.MILES
+                else -> DistanceUnitEnum.KM
+            }
         )
 
         dataProcessor.staticVehicleData.let {
@@ -117,6 +123,8 @@ class DataCollector: Service() {
             Toast.makeText(this, "Emulator Mode", Toast.LENGTH_LONG).show()
             emulatorMode = true
         }
+
+        CarStatsViewer.appPreferences.distanceUnit = if (!emulatorMode) dataProcessor.staticVehicleData.distanceUnit else DistanceUnitEnum.KM
 
         InAppLogger.i("[NEO] Google API availability: ${GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS}")
 

@@ -1,13 +1,22 @@
 package com.mbuehler.carStatsViewer.dataProcessor
 
+import android.app.Notification
+import android.app.PendingIntent
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.core.graphics.drawable.toBitmap
+import com.mbuehler.carStatsViewer.AutoStartReceiver
 import com.mbuehler.carStatsViewer.CarStatsViewer
 import com.mbuehler.carStatsViewer.Defines
+import com.mbuehler.carStatsViewer.R
 import com.mbuehler.carStatsViewer.carPropertiesClient.CarProperties
 import com.mbuehler.carStatsViewer.carPropertiesClient.CarPropertiesData
 import com.mbuehler.carStatsViewer.utils.TimeTracker
 import com.mbuehler.carStatsViewer.database.tripData.*
 import com.mbuehler.carStatsViewer.emulatorMode
 import com.mbuehler.carStatsViewer.emulatorPowerSign
+import com.mbuehler.carStatsViewer.liveDataApi.http.HttpLiveData
 import com.mbuehler.carStatsViewer.ui.plot.enums.PlotLineMarkerType
 import com.mbuehler.carStatsViewer.utils.InAppLogger
 import com.mbuehler.carStatsViewer.utils.Ticker
@@ -282,6 +291,25 @@ class DataProcessor {
 
         if (ignitionState != prevIgnition) {
             InAppLogger.i("[NEO] Ignition switched from ${IgnitionState.nameMap[prevIgnition]} to ${IgnitionState.nameMap[ignitionState]}")
+            if (prevIgnition == IgnitionState.START && ignitionState <= IgnitionState.ON && CarStatsViewer.appPreferences.phoneNotification) {
+
+                val phoneNotification = Notification.Builder(
+                    CarStatsViewer.appContext,
+                    CarStatsViewer.RESTART_CHANNEL_ID
+                )
+                    .setContentTitle(CarStatsViewer.appContext.getString(R.string.notification_phone))
+                    .setContentText(CarStatsViewer.appContext.getString(R.string.notification_valuables))
+                    .setSmallIcon(R.drawable.ic_notification_phone)
+                    .setOngoing(false)
+                    .setCategory(Notification.CATEGORY_CALL)
+                    .build()
+
+                CarStatsViewer.notificationManager.notify(99, phoneNotification)
+            }
+            if (prevIgnition < IgnitionState.ON && ignitionState >= IgnitionState.ON) {
+                CarStatsViewer.notificationManager.cancel(99)
+            }
+
         }
 
         if (drivingState != prevState) {
@@ -468,6 +496,9 @@ class DataProcessor {
             writeTripsToDatabase()
             InAppLogger.d("[NEO] Driving point written: ${mDrivenDistance.toFloat()} m, ${mUsedEnergy.toFloat()} Wh")
 
+            CoroutineScope(Dispatchers.IO).launch {
+                (CarStatsViewer.liveDataApis[1] as HttpLiveData).sendWithDrivingPoint(realTimeData, listOf(drivingPoint))
+            }
         }
     }
 
@@ -569,11 +600,18 @@ class DataProcessor {
             // } else if ((!emulatorMode && timestampSynchronizer.getSystemTimeFromNanosTimestamp(carPropertiesData.CurrentPower.timestamp) < System.currentTimeMillis() - 500) || (emulatorMode && timestampSynchronizer.getSystemTimeFromNanosTimestamp(carPropertiesData.CurrentSpeed.timestamp) < System.currentTimeMillis() - 500)) {
             //     InAppLogger.w("[NEO] Power value is too old!")
             } else {
+                InAppLogger.d("[CHARGING CURVE] Before time check: ")
+                InAppLogger.d("[CHARGING CURVE] SoC timestamp: ${carPropertiesData.BatteryLevel.timestamp}")
+                InAppLogger.d("[CHARGING CURVE] Power timestamp: ${carPropertiesData.CurrentPower.timestamp}")
                 // while ((!emulatorMode && timestampSynchronizer.getSystemTimeFromNanosTimestamp(carPropertiesData.CurrentPower.timestamp) < System.currentTimeMillis() - 500) || (emulatorMode && timestampSynchronizer.getSystemTimeFromNanosTimestamp(carPropertiesData.CurrentSpeed.timestamp) < System.currentTimeMillis() - 500)) {
                 while ((!emulatorMode && carPropertiesData.CurrentPower.timestamp < System.nanoTime() - 500_000_000) || (emulatorMode && carPropertiesData.CurrentSpeed.timestamp < System.nanoTime() - 500_000_000)) {
                     InAppLogger.w("[NEO] Power value is too old!")
                     delay(250)
                 }
+
+                InAppLogger.d("[CHARGING CURVE] After time check: ")
+                InAppLogger.d("[CHARGING CURVE] SoC timestamp: ${carPropertiesData.BatteryLevel.timestamp}")
+                InAppLogger.d("[CHARGING CURVE] Power timestamp: ${carPropertiesData.CurrentPower.timestamp}")
 
                 val currentTime = System.currentTimeMillis()
                 // InAppLogger.d("Time delta: ${currentTime - lastChargingPointTime}")
@@ -725,6 +763,9 @@ class DataProcessor {
                 localChargingSession?.chargingPoints = chargingPoints
             }
             _currentChargingSessionDataFlow.value = localChargingSession
+            CoroutineScope(Dispatchers.IO).launch {
+                (CarStatsViewer.liveDataApis[1] as HttpLiveData).sendWithDrivingPoint(realTimeData, chargingSessions = if (localChargingSession == null) null else listOf(localChargingSession!!))
+            }
             InAppLogger.i("[NEO] Charging session with ID ${localChargingSession?.charging_session_id} ended")
         }
     }

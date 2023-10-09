@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="polestar_orange">#FFD96C00</color>
+    <color name="volvo_blue">#2F6093</color>
     <color name="button_text_inactive">#A0A0A0</color>
     <color name="button_background_inactive">#121212</color>
     <color name="button_background_active">#D96C00</color>
@@ -16,7 +17,30 @@
     <color name="charge_marker">#2693ff</color>
     <color name="park_marker">@color/disabled_tint</color>
     <color name="bad_red">#771515</color>
+    <color name="bad_red_dark">#1C0D0E</color>
+    <color name="transparent_bad_red">#54771515</color>
     <color name="connected_blue">#2595FF</color>
     <color name="limited_yellow">#FFBF00</color>
     <color name="grid_line_color">#272727</color>
+
+    <color name="primary_90">#111315</color>
+    <color name="primary_80">#212427</color>
+    <color name="primary_70">#2E3338</color>
+    <color name="primary_60">#3C4349</color>
+    <color name="primary_50">#545B62</color>
+    <color name="primary_40">#6A7076</color>
+    <color name="primary_30">#7E8287</color>
+    <color name="primary_20">#94979A</color>
+    <color name="primary_10">#A8A9AA</color>
+
+    <color name="accent_40">#6684DA</color>
+    <color name="accent_50">#3C61C8</color>
+    <color name="accent_60">#1F459F</color>
+
+    <color name="club_blue">#447ea6</color>
+    <color name="club_violet">#77347b</color>
+    <color name="club_night">#0a0f14</color>
+    <color name="club_night_variant">#111922</color>
+    <color name="club_dk_blue">#161d39</color>
+    <color name="club_hint">#f7ea48</color>
 </resources>

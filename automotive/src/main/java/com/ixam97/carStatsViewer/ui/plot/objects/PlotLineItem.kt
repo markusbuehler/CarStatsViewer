@@ -6,7 +6,7 @@ import com.mbuehler.carStatsViewer.ui.plot.enums.PlotLineMarkerType
 import com.mbuehler.carStatsViewer.utils.Exclude
 import kotlin.math.roundToInt
 
-class PlotLineItem (
+data class PlotLineItem (
     var Value: Float,
     val EpochTime: Long,
     @Exclude

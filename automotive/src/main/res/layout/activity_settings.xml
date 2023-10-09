@@ -41,12 +41,10 @@
     </LinearLayout>
 
     <View
+        style="@style/action_bar_line"
         android:id="@+id/settings_title_divider"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="?android:attr/colorControlActivated"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        tools:layout_editor_absoluteX="97dp" />
+        app:layout_constraintLeft_toLeftOf="parent"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -113,6 +111,15 @@
                 android:id="@+id/settings_switch_autostart"
                 style="@style/menu_standard_switch_style"
                 android:text="@string/settings_autostart" />
+
+            <View
+                style="@style/menu_divider_style"
+                android:background="?android:attr/listDivider" />
+
+            <Switch
+                android:id="@+id/settings_switch_phone_reminder"
+                style="@style/menu_standard_switch_style"
+                android:text="@string/settings_phone_reminder" />
 
             <View
                 style="@style/menu_divider_style"

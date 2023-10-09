@@ -48,7 +48,7 @@ class AppPreferences(
     private val BstEdition = AppPreference<Boolean>(context.getString(R.string.preference_bst_key), false, sharedPref)
 
     private val AltLayout = AppPreference<Boolean>("preference_alt_layout", false, sharedPref)
-
+    private val ShowScreenshotButton = AppPreference<Boolean>("preference_show_screenshot_button", false, sharedPref)
     private val TripFilterManual = AppPreference<Boolean>(context.getString(R.string.preference_trip_filter_manual_key), true, sharedPref)
     private val TripFilterCharge = AppPreference<Boolean>(context.getString(R.string.preference_trip_filter_charge_key), true, sharedPref)
     private val TripFilterAuto = AppPreference<Boolean>(context.getString(R.string.preference_trip_filter_auto_key), true, sharedPref)
@@ -56,6 +56,9 @@ class AppPreferences(
     private val TripFilterTime = AppPreference<Long>(context.getString(R.string.preference_trip_filter_time_key), 0L, sharedPref)
 
     private val MainViewConnectionApi = AppPreference<Int>(context.getString(R.string.preference_main_view_connection_api_key), 0, sharedPref)
+    private val HttpApiTelemetryType = AppPreference<Int>("preference_telemetry_type", 2, sharedPref)
+
+    private val PhoneNotification = AppPreference<Boolean>("preference_phone_notification", false, sharedPref)
 
     var versionString: String get() = VersionString.value; set(value) {VersionString.value = value}
 
@@ -84,7 +87,7 @@ class AppPreferences(
     var plusPack: Boolean get() = PlusPack.value; set(value) {PlusPack.value = value}
     var performanceUpgrade: Boolean get() = PerformanceUpgrade.value; set(value) {PerformanceUpgrade.value = value}
     var bstEdition: Boolean get() = BstEdition.value; set(value) {BstEdition.value = value}
-
+    var showScreenshotButton: Boolean get() = ShowScreenshotButton.value; set(value) {ShowScreenshotButton.value = value}
     var altLayout: Boolean get() = AltLayout.value; set(value) {AltLayout.value = value}
 
     var tripFilterManual: Boolean get() = TripFilterManual.value; set(value) {TripFilterManual.value = value}
@@ -94,8 +97,9 @@ class AppPreferences(
     var tripFilterTime: Long get() = TripFilterTime.value; set(value) {TripFilterTime.value = value}
 
     var mainViewConnectionApi: Int get() = MainViewConnectionApi.value; set(value) {MainViewConnectionApi.value = value}
+    var httpApiTelemetryType: Int get() = HttpApiTelemetryType.value; set(value) {HttpApiTelemetryType.value = value}
 
-
+    var phoneNotification: Boolean get() = PhoneNotification.value; set(value) {PhoneNotification.value = value}
 
     // Preferences not saved permanently:
     val exclusionStrategy = AppPreferences.exclusionStrategy
