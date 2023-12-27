@@ -14,6 +14,7 @@ import com.airbnb.paris.extensions.style
 import com.mbuehler.carStatsViewer.CarStatsViewer
 import com.mbuehler.carStatsViewer.R
 import com.mbuehler.carStatsViewer.utils.applyTypeface
+import com.mbuehler.carStatsViewer.utils.setContentViewAndTheme
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.util.withContext
 import kotlinx.android.synthetic.main.activity_libs.*
@@ -21,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_libs.*
 class LibsActivity: FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_libs)
+        setContentViewAndTheme(this, R.layout.activity_libs)
 
         libs_button_back.setOnClickListener {
             finish()

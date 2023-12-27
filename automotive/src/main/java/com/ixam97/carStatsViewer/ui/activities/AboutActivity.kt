@@ -10,13 +10,14 @@ import com.mbuehler.carStatsViewer.BuildConfig
 import com.mbuehler.carStatsViewer.CarStatsViewer
 import com.mbuehler.carStatsViewer.R
 import com.mbuehler.carStatsViewer.utils.applyTypeface
+import com.mbuehler.carStatsViewer.utils.setContentViewAndTheme
 import kotlinx.android.synthetic.main.activity_about.*
 
 class AboutActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_about)
+        setContentViewAndTheme(this, R.layout.activity_about)
 
         CarStatsViewer.typefaceMedium?.let {
             applyTypeface(about_activity)

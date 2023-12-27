@@ -11,6 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.mbuehler.carStatsViewer.CarStatsViewer
 import com.mbuehler.carStatsViewer.R
 import com.mbuehler.carStatsViewer.utils.applyTypeface
+import com.mbuehler.carStatsViewer.utils.setContentViewAndTheme
 import kotlinx.android.synthetic.main.activity_settings_apis.*
 import kotlinx.coroutines.launch
 
@@ -20,8 +21,7 @@ class SettingsApisActivity: FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_settings_apis)
+        setContentViewAndTheme(this, R.layout.activity_settings_apis)
 
         CarStatsViewer.typefaceMedium?.let {
             applyTypeface(settings_apis_activity)
