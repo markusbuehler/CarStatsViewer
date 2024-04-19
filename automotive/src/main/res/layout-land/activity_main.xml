@@ -337,7 +337,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.ixam97.carStatsViewer.ui.views.MultiButtonWidget
+                    <com.mbuehler.carStatsViewer.ui.views.MultiButtonWidget
                         android:id="@+id/main_distance_selector"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/main_toolbar_height"
