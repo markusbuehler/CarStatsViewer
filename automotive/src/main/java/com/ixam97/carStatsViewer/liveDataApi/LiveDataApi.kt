@@ -3,6 +3,7 @@ package com.mbuehler.carStatsViewer.liveDataApi
 import android.content.Context
 import android.os.Handler
 import com.mbuehler.carStatsViewer.CarStatsViewer
+import com.mbuehler.carStatsViewer.R
 import com.mbuehler.carStatsViewer.dataProcessor.RealTimeData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -40,7 +41,9 @@ abstract class LiveDataApi(
     /**
      * Dialog to setup API.
      */
-    abstract fun showSettingsDialog(context: Context)
+    open fun showSettingsDialog(context: Context) {
+        context.setTheme(R.style.AppTheme)
+    }
 
     /**
      * creates a runnable to be executed in intervals. Returns null if API does not send data in
