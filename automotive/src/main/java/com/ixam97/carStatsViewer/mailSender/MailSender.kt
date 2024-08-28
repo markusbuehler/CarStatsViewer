@@ -2,9 +2,6 @@ package com.mbuehler.carStatsViewer.mailSender
 
 import android.graphics.Bitmap
 import com.mbuehler.carStatsViewer.CarStatsViewer
-import kotlin.jvm.Synchronized
-import kotlin.Throws
-import com.mbuehler.carStatsViewer.mailSender.JSSEProvider
 import jakarta.activation.DataHandler
 import jakarta.activation.DataSource
 import jakarta.activation.FileDataSource

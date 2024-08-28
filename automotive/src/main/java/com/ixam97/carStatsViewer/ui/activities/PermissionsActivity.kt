@@ -8,10 +8,9 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import com.mbuehler.carStatsViewer.BuildConfig
 import com.mbuehler.carStatsViewer.CarStatsViewer
-import com.mbuehler.carStatsViewer.utils.InAppLogger
 import com.mbuehler.carStatsViewer.R
-import com.mbuehler.carStatsViewer.utils.setContentViewAndTheme
-import kotlinx.android.synthetic.main.activity_permissions.permissions_version
+import com.mbuehler.carStatsViewer.databinding.ActivityPermissionsBinding
+import com.mbuehler.carStatsViewer.utils.InAppLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,11 +26,16 @@ class PermissionsActivity: Activity() {
         )
     }
 
+    private lateinit var binding: ActivityPermissionsBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentViewAndTheme(this, R.layout.activity_permissions)
+        if (CarStatsViewer.appPreferences.colorTheme > 0) setTheme(R.style.ColorTestTheme)
+        binding = ActivityPermissionsBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        permissions_version.text = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})"
+        binding.permissionsVersion.text = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})"
 
         CoroutineScope(Dispatchers.Default).launch {
             while (!CarStatsViewer.fontsLoaded) {

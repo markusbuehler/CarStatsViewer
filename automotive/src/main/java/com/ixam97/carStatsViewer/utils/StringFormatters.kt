@@ -2,7 +2,9 @@ package com.mbuehler.carStatsViewer.utils
 
 import android.text.format.DateFormat
 import com.mbuehler.carStatsViewer.CarStatsViewer
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 object StringFormatters {

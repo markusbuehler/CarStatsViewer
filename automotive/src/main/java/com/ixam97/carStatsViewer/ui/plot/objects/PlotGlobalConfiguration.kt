@@ -1,7 +1,11 @@
 package com.mbuehler.carStatsViewer.ui.plot.objects
 
+import com.mbuehler.carStatsViewer.ui.plot.enums.PlotDimensionSmoothingType
+import com.mbuehler.carStatsViewer.ui.plot.enums.PlotDimensionY
+import com.mbuehler.carStatsViewer.ui.plot.enums.PlotHighlightMethod
+import com.mbuehler.carStatsViewer.ui.plot.enums.PlotLineLabelFormat
+import com.mbuehler.carStatsViewer.ui.plot.enums.PlotSessionGapRendering
 import com.mbuehler.carStatsViewer.utils.DistanceUnitEnum
-import com.mbuehler.carStatsViewer.ui.plot.enums.*
 
 object PlotGlobalConfiguration {
     val DataVersion : Int? = 20230206

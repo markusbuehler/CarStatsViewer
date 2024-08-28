@@ -1,16 +1,25 @@
 package com.mbuehler.carStatsViewer.ui.activities
-
-import android.app.Activity
+/*
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.FragmentActivity
+import com.mbuehler.carStatsViewer.BuildConfig
 import com.mbuehler.carStatsViewer.CarStatsViewer
 import com.mbuehler.carStatsViewer.R
 import com.mbuehler.carStatsViewer.utils.VehicleDefinitions
-import com.mbuehler.carStatsViewer.utils.applyTypeface
-import com.mbuehler.carStatsViewer.utils.setContentViewAndTheme
-import kotlinx.android.synthetic.main.activity_settings_vehicle.*
-import kotlinx.coroutines.*
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_button_back
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_code
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_multiselect_drivetrain
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_multiselect_model_year
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_scrollview
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_string
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_switch_bst
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_switch_performance
+import kotlinx.android.synthetic.main.activity_settings_vehicle.settings_vehicle_switch_plus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SettingsVehicleActivity : FragmentActivity() {
 
@@ -21,13 +30,11 @@ class SettingsVehicleActivity : FragmentActivity() {
 
         setContentViewAndTheme(this, R.layout.activity_settings_vehicle)
 
-        CarStatsViewer.typefaceMedium?.let {
-            applyTypeface(settings_vehicle_activity)
-        }
-
         settings_vehicle_button_back.setOnClickListener {
             finish()
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+            if (BuildConfig.FLAVOR_aaos != "carapp") {
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+            }
         }
 
         settings_vehicle_multiselect_drivetrain.entries = VehicleDefinitions.Polestar2.driveTrains
@@ -135,3 +142,4 @@ class SettingsVehicleActivity : FragmentActivity() {
 
     }
 }
+*/

@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.mbuehler.carStatsViewer.CarStatsViewer
 import com.mbuehler.carStatsViewer.R
-import com.mbuehler.carStatsViewer.ui.activities.HistoryActivity
 import com.mbuehler.carStatsViewer.database.tripData.DrivingSession
 import com.mbuehler.carStatsViewer.database.tripData.TripType
+import com.mbuehler.carStatsViewer.ui.activities.HistoryActivity
 import com.mbuehler.carStatsViewer.ui.views.TripHistoryRowWidget
 import com.mbuehler.carStatsViewer.utils.InAppLogger
 import kotlinx.coroutines.CoroutineScope
